@@ -1,15 +1,53 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import todo_icon from '../assets/todo_icon.png';
 import TodoItems from './TodoItems';
 
 const Todo = () => {
 
+  const [todoList, setTodoList] = useState([]);
+
+
+
   const inputRef = useRef();
 
   const add = () => {
     const inputText = inputRef.current.value.trim();
-    console.log(inputText);
+    // console.log(inputText);
+
+    if(inputText === ''){
+      return null;
+    }
+
+    const newTodo = {
+      id: Date.now(),
+      text: inputText,
+      isComplete: false,
+    }
+
+    setTodoList((prev) => [...prev, newTodo] );
+    inputRef.current.value = "";
+  } // add 
+
+  const deleteTodo = (id) => {
+    setTodoList((prevTodos) => {
+      return prevTodos.filter((todo) => todo.id !== id)
+    })
+  } // deleteTodo
+
+  const toggle = (id) => {
+    setTodoList((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if(todo.id === id){
+          return {...todo, isComplete: !todo.isComplete}  
+        }
+        return todo;
+      })
+    })
   }
+
+  useEffect(() => {
+    console.log(todoList);
+  }, [todoList])
 
   return (
     <div className='bg-white place-self-center w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-xl'>
@@ -31,8 +69,11 @@ const Todo = () => {
       {/* ------- todo list -------  */}
 
       <div>
-        <TodoItems text="Learn Coding" />
-        <TodoItems text="Learn Coding from Imon" />
+        {todoList.map((item, index) => {
+          return <TodoItems key={index} text={item.text} id={item.id} isComplete={item.isComplete} deleteTodo={deleteTodo} toggle={toggle} />
+        })}
+        {/* <TodoItems text="Learn Coding" />
+        <TodoItems text="Learn Coding from Imon" /> */}
       </div>
 
 
